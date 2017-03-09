@@ -1,0 +1,19 @@
+{
+  "name": "vuejs-calendar",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Jacksay/vuejs-calendar",
+  "authors": [
+    "Stéphane Bouvry <stephane.bouvry@unicaen.fr>"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

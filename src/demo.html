@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exemple simple</title>
+  <link rel="stylesheet" href="css/calendar.css">
+</head>
+<body>
+  <div id="app">
+    <calendar></calendar>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js"></script>
+  <script>
+    requirejs.config({
+      paths: {
+        'moment': 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment-with-locales.min',
+        'vue': 'https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue',
+        'EventDT' : 'js/EventDT',
+        'calendar' : 'js/calendar'
+      },
+      shim: {
+        'calendar': {
+          deps: ['EventDT', 'vue', 'moment']
+        },
+        'moment': {
+          exports: 'moment'
+        },
+        'EventDT': {
+          deps: ['moment'],
+          exports: 'EventDT'
+        }
+      }
+    });
+  </script>
+  <script>
+  require(['vue', 'calendar'], function(Vue, Calendar){
+    var vue = new Vue({
+      el: "#app",
+      components: {
+        'calendar': Calendar
+      }
+    })
+
+  })
+  </script>
+
+</body>
+</html>

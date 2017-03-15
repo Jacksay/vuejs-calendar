@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i');
+
 $color: #ddd;
 * {
   box-sizing: border-box;
@@ -5,27 +7,143 @@ $color: #ddd;
 
 body {
   font-size: 14px;
-  font-family: Arial;
+  font-family: 'Open Sans';
+  background: #ddd;
 }
 .calendar {
-  background: $color;
-  .line {
+  position: relative;
+
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+
+  .copy-paste {
+    display: inline;
+    font-weight: normal;
+    font-size: .75em;
+    &:before {
+      content: " ~ "
+    }
+    span {
+      opacity: .3;
+      cursor: pointer;
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .editor {
+    background: rgba(255,255,255,.9);
     display: flex;
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    form {
+
+    }
   }
 
   .event {
-    border: solid thin #000;
-    padding: 4px;
+    border: solid thin rgba(0,0,0,.5);
+    cursor: pointer;
+    padding: 0 4px;
+    margin: 0 .5%;
     box-shadow: 0 0 4px rgba(0,0,0,.3);
+    background-color: rgba(255,255,255,.9);
+
+    .bottom-handler {
+      display: block;
+      position: absolute;
+      bottom: 0;
+      text-align: center;
+      text-shadow: -1px 1px 0 rgba(0,0,0,.3), 1px -1px 0 rgba(255,255,255,.3);
+      border-top: solid thin rgba(0,0,0,.3);
+      font-size: .7em;
+      left: 1em;
+      right: 1em;
+      color: rgba(0,0,0,.5);
+      &:hover {
+        background-color: rgba(255,255,255,.25);
+      }
+    }
+
+    nav {
+      font-size: .8em;
+      text-align: center;
+      background: black;
+      line-height: 20px;
+      height: 20px;
+      top: -20px;
+      position: absolute;
+      left: 0;
+      border: solid thin black;
+      right: 0;
+      display: none;
+
+      a {
+        opacity: .75;
+        text-decoration: none;
+        color: rgba(255,255,255, 1);
+        &:hover {
+          opacity: 1;
+        }
+      }
+      &:hover {
+        z-index: 100;
+      }
+    }
+    &:hover nav { display: block }
+
+    &.event-moving {
+      cursor: move;
+      z-index: 10;
+      border-color: rgba(0,0,0,1);
+      padding: 3px;
+      box-shadow: -2px 2px 8px rgba(0,0,0,.3);
+      .bottom-handler {
+        //transform: scaleY(4);
+        background-color: rgba(255,255,255,0);
+      }
+    }
+
+    &.event-locked {
+      opacity: .75;
+      cursor: not-allowed;
+    }
+
+    &.event-selected {
+
+    }
+
     .label {
-      font-weight: bolder;
+      font-weight: 400;
+      border-bottom: dotted #000 thin;
+      line-height: 1.25;
+      padding: 2px 0;
+      margin-bottom: .3em;
+      //text-shadow: 1px -1px 0 rgba(255,255,255,.25);
+      color: black;
     }
+
     .description {
-      font-size: .9em;
+      font-size: .8em;
       font-weight: lighter;
+      color: black;
     }
+
     .time {
       position: absolute;
+      color: #ffffff;
+      text-shadow: -1px 1px 0 rgba(0,0,0,.7);
       z-index: 3;
       font-size: .75em;
       font-weight: lighter;
@@ -41,29 +159,255 @@ body {
       &.end {
         bottom: 0;
         right: 0;
-        box-shadow: -2px -2px 1px rgba(0,0,0,.3);
+        box-shadow: -1px -1px 4px rgba(0,0,0,.3);
       }
 
     }
   }
 
-  .cell {
-    flex: 1;
-    background: rgba(255,0,0,.5)
+  .list-item {
+    strong {
+      text-shadow: 1px -1px 0 rgba(255,255,255,.5);
+    }
+    strong:before {
+
+      font-family: "fontello";
+      font-style: normal;
+      font-weight: normal;
+      speak: none;
+
+      display: inline-block;
+      text-decoration: inherit;
+      width: 1em;
+      margin-right: .2em;
+      text-align: center;
+      /* opacity: .8; */
+
+      /* For safety - reset parent styles, that can break glyph codes*/
+      font-variant: normal;
+      text-transform: none;
+
+      /* fix buttons height, for twitter bootstrap */
+      line-height: 1em;
+
+      /* Animation center compensation - margins should be symmetric */
+      /* remove if not needed */
+      margin-left: .2em;
+
+      /* you can be more comfortable with increased icons size */
+      /* font-size: 120%; */
+
+      /* Font smoothing. That was taken from TWBS */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    &.status-draft strong:before {
+      content: '\e882'; }
+    &.status-send strong:before{
+      content: '\e88a'; }
+    &.status-valid strong:before {
+      content: '\e85b'; }
+    &.status-reject strong:before {
+      content: '\e865'; }
+
   }
 
-  .content {
-    max-height: 400px;
+
+    .event {
+
+    &.status-draft, &.status-send, &.status-valid, &.status-reject {
+      .label:before, .label:before {
+        font-family: "fontello";
+        font-style: normal;
+        font-weight: normal;
+        speak: none;
+
+        display: inline-block;
+        text-decoration: inherit;
+        width: 1em;
+        margin-right: .2em;
+        text-align: center;
+        /* opacity: .8; */
+
+        /* For safety - reset parent styles, that can break glyph codes*/
+        font-variant: normal;
+        text-transform: none;
+
+        /* fix buttons height, for twitter bootstrap */
+        line-height: 1em;
+
+        /* Animation center compensation - margins should be symmetric */
+        /* remove if not needed */
+        margin-left: .2em;
+
+        /* you can be more comfortable with increased icons size */
+        /* font-size: 120%; */
+
+        /* Font smoothing. That was taken from TWBS */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+
+        /* Uncomment for 3D effect */
+        /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+      }
+    }
+    &.status-draft .label:before, &.status-draft .label:before {
+      content: '\e882'; }
+    &.status-send .label:before, &.status-send .label:before {
+      content: '\e88a'; }
+    &.status-valid .label:before, &.status-valid .label:before {
+      content: '\e85b'; }
+    &.status-reject .label:before, &.status-reject .label:before {
+      content: '\e865'; }
+  }
+
+  .line {
+    display: block;
+    position: relative;
+    &:after, &:before {
+      content: ' ';
+      display: block;
+      clear: both;
+    }
+  }
+
+  .cell {
+    display: block;
+    width: 14.285%;
+    background: rgba(0,0,0,.05);
+  }
+  .cell:nth-child(odd) {
+    background: rgba(0,0,0,.1);
+  }
+
+  header .content-full {
+    box-shadow: 0 .5em .5em rgba(0,0,0,.25);
+    line-height: 1.6em;
+    font-weight: 100;
+    text-align: center;
+    text-shadow: -1px 1px 1px rgba(0,0,0,.3);
+    border-bottom: solid thin rgba(0,0,0,.3);
+  }
+
+  header .cell-day {
+    border-left: solid thin rgba(255,255,255,.5);
+    text-align: center;
+    font-weight: 300;
+    text-shadow: 1px -1px 0 rgba(255,255,255,.5);
+    color: rgba(100,100,100,1)
+  }
+
+  .content-full {
+    display: flex;
+  }
+  .labels-time {
+    width: 50px;
+  }
+  .events {
+    flex: 1;
+    display: flex;
+    position: relative;
+  }
+
+  .meta {
+    display: flex;
+    font-size: 1.25em;
+    a {
+      flex: 0;
+      line-height: 100%;
+      display: block;
+      font-size: .8em;
+      padding: .2em;
+      text-decoration: none;
+      background: rgba(0,0,0,.3);
+      color: white
+    }
+    h3 {
+      flex: 1;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+  }
+
+  .hour {
+    border-bottom: thin solid rgba(0,0,0,.1);
+    height: 40px;
+    &:not(.houroff):hover{
+      background: rgba(255,255,255,.4);
+    }
+    &.houroff {
+      background-image: url('bg.gif');
+      background-repeat: repeat;
+      opacity: .3;
+    }
+  }
+
+
+
+  .content-wrapper {
+    max-height: 80vh;
     overflow: scroll;
     position: relative;
+    scroll-behavior: smooth;
   }
 
   .unit {
     height: 40px;
     font-size: .8em;
-    border-top: thin dotted rgba(255,255,255,.8);
+    border-top: thin dotted rgba(255,255,255,.9);
     width: 4em;
     text-align: center;
     padding: 4px;
+  }
+}
+
+.calendar-list {
+
+  // Par jour
+  .events {
+    display: flex;
+    border-bottom: thin solid rgba(255,255,255,.5);
+    padding: 2px 0;
+    h3 {
+      flex: 1;
+      margin: 0;
+      padding: 0;
+      font-weight: 100;
+      font-size: 1em;
+    }
+    .total {
+      flex: 1;
+      text-align: right;
+      padding: 4px;
+      font-weight: bold;
+    }
+    .events-list {
+      background: rgba(255,255,255,.5);
+      flex: 7;
+      position: relative;
+      .list-item {
+        display: flex;
+        position: absolute;
+        background: white;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 4px;
+        time {
+          flex: 1;
+          font-weight: 100;
+          font-size: .9em;
+        }
+        strong {
+          text-align: center;
+          font-weight: normal;
+          flex: 2
+        }
+        .end {
+          text-align: right;
+        }
+      }
+    }
   }
 }

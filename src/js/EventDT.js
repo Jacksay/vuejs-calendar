@@ -1,7 +1,9 @@
 import moment from "moment";
 
+moment.locale('fr');
+
 class EventDT {
-  constructor(id, label, start, end){
+  constructor(id, label, start, end, description="", actions={}, status='draft'){
     this.id = id;
 
     // From ICS format
@@ -11,18 +13,54 @@ class EventDT {
     this.label = label;
 
     // ICS : description
-    this.description = "Description par défaut pour les tests";
+    this.description = description;
+
+
+    // OSCAR
+    this.editable = actions.editable || false;
+    this.deletable = actions.deletable || false;
+    this.validable = actions.validable || false;
+    this.sendable= actions.sendable || false;
+
+    this.status = status;
+
+
+    // Status
+    // - DRAFT, SEND, VALID, REJECT
 
     this.start = start;
+
     this.end = end;
   }
 
+  /**
+   * Retourne un objet moment pour la date de début.
+   */
   get mmStart(){
     return moment(this.start)
   }
 
+  /**
+   * Retourne un objet moment pour la date de fin.
+   */
   get mmEnd(){
     return moment(this.end)
+  }
+
+  /**
+   * Retourne la durée de l'événement en minutes.
+   * @returns {number}
+   */
+  get durationMinutes(){
+    return (this.mmEnd.unix() - this.mmStart.unix())/60;
+  }
+
+  /**
+   * Retourne la durée de l'événement en heure.
+   * @returns {number}
+   */
+  get duration(){
+    return this.durationMinutes / 60;
   }
 
   /**
@@ -42,5 +80,41 @@ class EventDT {
           return false
 
     return mmStart < plageFin || mmEnd > plageStart;
+  }
+
+  isBefore( eventDT ){
+    if( this.mmStart < eventDT.mmStart ){
+      return true;
+    }
+    return false;
+  }
+
+
+  static first( events ){
+    var first = null;
+    events.forEach((e1) => {
+      if( first == null ){
+        first = e1;
+      } else {
+        if( e1.isBefore(first) ){
+          first = e1;
+        }
+      }
+    });
+    return first;
+  }
+
+
+  static sortByStart( events ){
+    var sorted = events.sort((e1,e2) => {
+      if( e1.mmStart < e2.mmStart )
+          return -1
+
+      else if( e1.mmStart > e2.mmStart )
+          return 1
+
+      return 0;
+    });
+    return sorted;
   }
 }

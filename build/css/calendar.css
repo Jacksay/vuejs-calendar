@@ -203,6 +203,9 @@ body {
     display: block;
     width: 14.285%;
     background: rgba(0, 0, 0, 0.05); }
+    .calendar .cell.today {
+      background: rgba(68, 144, 200, 0.5);
+      font-weight: bold; }
   .calendar .cell:nth-child(odd) {
     background: rgba(0, 0, 0, 0.1); }
   .calendar header .content-full {
@@ -218,6 +221,10 @@ body {
     font-weight: 300;
     text-shadow: 1px -1px 0 rgba(255, 255, 255, 0.5);
     color: #646464; }
+    .calendar header .cell-day:hover .copy-paste {
+      opacity: 1; }
+    .calendar header .cell-day .copy-paste {
+      opacity: 0; }
   .calendar .content-full {
     display: flex; }
   .calendar .labels-time {
@@ -245,9 +252,10 @@ body {
       text-align: center; }
   .calendar .hour {
     border-bottom: thin solid rgba(0, 0, 0, 0.1);
+    transition: background .3s;
     height: 40px; }
     .calendar .hour:not(.houroff):hover {
-      background: rgba(255, 255, 255, 0.4); }
+      background: rgba(68, 144, 200, 0.25); }
     .calendar .hour.houroff {
       background-image: url("bg.gif");
       background-repeat: repeat;

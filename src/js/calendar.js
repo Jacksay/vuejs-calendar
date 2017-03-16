@@ -6,7 +6,7 @@ moment.locale('fr');
 
 
 var colorLabels = [];
-var colorpool = ['#4799f1', '#Fac01c', '#5460ad', '#7a0497', '#8a6d44', '#d10a92', '#ec0361', '#8befb0', '#ff6f4c', '#f1a7f2', '#de70e6', '#e7cec4', '#baf911', '#a5e46b', '#3ff466', '#64b641', '#21bc8d', '#2c8620', '#a77fea', '#fa1418', '#b4a068', '#F94112', '#F8f33a', '#eee162'];
+var colorpool = ['#Fac01c','#4799f1','#64b641','#fa1418','#F8f33a','#ec0361','#8befb0','#5460ad','#8a6d44','#7a0497','#a5e46b','#21bc8d','#de70e6','#e7cec4','#d10a92','#ff6f4c','#F94112','#f1a7f2','#baf911','#a77fea','#3ff466','#b4a068','#2c8620','#eee162'];
 var colorLabel = (label) => {
     var index = colorLabels.indexOf(label);
     if( index == -1 ){
@@ -25,7 +25,7 @@ var colorLabel = (label) => {
 
 class CalendarDatas {
     constructor(){
-        this.state = 'list';
+        this.state = 'week';
         this.events = [];
         this.newID = 1;
         this.eventEditData = null;
@@ -36,7 +36,7 @@ class CalendarDatas {
         this.copyDayData = null;
         this.generatedId = 0;
         this.defaultLabel = "Nouvel événement";
-        this.defaultDescription = "Description par défaut";
+        this.defaultDescription = "";
     }
 
     get listEvents(){
@@ -46,6 +46,14 @@ class CalendarDatas {
 
     get today(){
         return moment();
+    }
+
+    get firstEvent(){
+
+    }
+
+    get lastEvent(){
+
     }
 
 
@@ -445,7 +453,7 @@ var WeekView = {
                 {{currentYear}}
             </div>
             <div class="events">
-                <div class="cell cell-day day day-1" v-for="day in currentWeekDays">
+                <div class="cell cell-day day day-1" :class="{today: isToday(day)}" v-for="day in currentWeekDays">
                     {{ day.format('dddd D') }}
                     <nav class="copy-paste">
                         <span href="#" @click="copyDay(day)"><i class="icon-docs"></i></span>
@@ -600,6 +608,10 @@ var WeekView = {
             this.currentDay = moment(this.currentDay).add(1, 'week');
         },
 
+        isToday( day ){
+            return day.format('YYYY-MM-DD') == store.today.format('YYYY-MM-DD');
+        },
+
         newEvent(evt){
             evt.id = this.generatedId++;
             this.events.push(evt)
@@ -692,7 +704,7 @@ var ListView = {
             return store.firstEvent;
         },
         lastDate(){
-            return store.firstEvent;
+            return store.lastEvent;
         },
     },
 
@@ -779,16 +791,16 @@ var Calendar = {
 
             <nav class="views-switcher">
                 <a href="#" @click.prevent="state = 'week'"><i class="icon-calendar"></i>{{ trans.labelViewWeek }}</a>
-                <a href="#" @click.prevent="state = 'month'"><i class="icon-table"></i>{{ trans.labelViewMonth }}</a>
                 <a href="#" @click.prevent="state = 'list'"><i class="icon-columns"></i>{{ trans.labelViewList }}</a>
                 <input type="file" @change="loadIcsFile">
             </nav>
-            <monthview v-show="state == 'month'"></monthview>
             <weekview v-show="state == 'week'"></weekview>
             <listview v-show="state == 'list'"></listview>
         </div>
 
     `,
+
+    //                <!-- <a href="#" @click.prevent="state = 'month'"><i class="icon-table"></i>{{ trans.labelViewMonth }}</a> -->            <monthview v-show="state == 'month'"></monthview>
 
     data(){
         return store
@@ -837,7 +849,6 @@ var Calendar = {
           })
         },
 
-
         deleteEvent(event){
             this.events.splice(this.events.indexOf(event), 1);
         },
@@ -865,7 +876,6 @@ var Calendar = {
     },
 
     mounted(){
-        console.log('Mounted !', this);
         if( this.fetch ) this.fetch();
         /*
         store.addNewEvent('Item D',

@@ -34,7 +34,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 _momentTimezone2.default.locale('fr');
 
 var colorLabels = [];
-var colorpool = ['#4799f1', '#Fac01c', '#5460ad', '#7a0497', '#8a6d44', '#d10a92', '#ec0361', '#8befb0', '#ff6f4c', '#f1a7f2', '#de70e6', '#e7cec4', '#baf911', '#a5e46b', '#3ff466', '#64b641', '#21bc8d', '#2c8620', '#a77fea', '#fa1418', '#b4a068', '#F94112', '#F8f33a', '#eee162'];
+var colorpool = ['#Fac01c', '#4799f1', '#64b641', '#fa1418', '#F8f33a', '#ec0361', '#8befb0', '#5460ad', '#8a6d44', '#7a0497', '#a5e46b', '#21bc8d', '#de70e6', '#e7cec4', '#d10a92', '#ff6f4c', '#F94112', '#f1a7f2', '#baf911', '#a77fea', '#3ff466', '#b4a068', '#2c8620', '#eee162'];
 var _colorLabel = function _colorLabel(label) {
     var index = colorLabels.indexOf(label);
     if (index == -1) {
@@ -53,7 +53,7 @@ var CalendarDatas = function () {
     function CalendarDatas() {
         _classCallCheck(this, CalendarDatas);
 
-        this.state = 'list';
+        this.state = 'week';
         this.events = [];
         this.newID = 1;
         this.eventEditData = null;
@@ -64,7 +64,7 @@ var CalendarDatas = function () {
         this.copyDayData = null;
         this.generatedId = 0;
         this.defaultLabel = "Nouvel événement";
-        this.defaultDescription = "Description par défaut";
+        this.defaultDescription = "";
     }
 
     _createClass(CalendarDatas, [{
@@ -185,6 +185,12 @@ var CalendarDatas = function () {
         get: function get() {
             return (0, _momentTimezone2.default)();
         }
+    }, {
+        key: "firstEvent",
+        get: function get() {}
+    }, {
+        key: "lastEvent",
+        get: function get() {}
     }, {
         key: "currentYear",
         get: function get() {
@@ -411,7 +417,7 @@ var WeekView = (_WeekView = {
         'timeevent': TimeEvent
     },
 
-    template: "<div class=\"calendar calendar-week\">\n    <div class=\"meta\">\n        <a href=\"#\" @click=\"previousWeek\">\n            <i class=\"icon-left-big\"></i>\n        </a>\n        <h3>\n            semaine {{ currentWeekNum}}, {{ currentMonth }} {{ currentYear }}\n            <nav class=\"copy-paste\">\n                <span href=\"#\" @click=\"copyCurrentWeek\"><i class=\"icon-docs\"></i></span>\n                <span href=\"#\" @click=\"pasteWeek\"><i class=\"icon-paste\"></i></span>\n            </nav>\n        </h3>\n       <a href=\"#\" @click=\"nextWeek\">\n            <i class=\"icon-right-big\"></i>\n       </a>\n    </div>\n\n    <header class=\"line\">\n        <div class=\"content-full\" style=\"margin-right: 12px\">\n            <div class=\"labels-time\">\n                {{currentYear}}\n            </div>\n            <div class=\"events\">\n                <div class=\"cell cell-day day day-1\" v-for=\"day in currentWeekDays\">\n                    {{ day.format('dddd D') }}\n                    <nav class=\"copy-paste\">\n                        <span href=\"#\" @click=\"copyDay(day)\"><i class=\"icon-docs\"></i></span>\n                        <span href=\"#\" @click=\"pasteDay(day)\"><i class=\"icon-paste\"></i></span>\n                    </nav>\n                </div>\n            </div>\n        </div>\n    </header>\n\n    <div class=\"content-wrapper\">\n        <div class=\"content-full\">\n          <div class=\"labels-time\">\n            <div class=\"unit timeinfo\" v-for=\"time in 24\">{{time-1}}:00</div>\n          </div>\n          <div class=\"events\">\n\n              <div class=\"cell cell-day day\" v-for=\"day in 7\">\n                <div class=\"hour houroff\" v-for=\"time in 6\">&nbsp;</div>\n                <div class=\"hour\" v-for=\"time in 16\" @dblclick=\"createEvent(day, time+5)\">&nbsp;</div>\n                <div class=\"hour houroff\" v-for=\"time in 2\">&nbsp;</div>\n              </div>\n              <div class=\"content-events\">\n                <timeevent v-for=\"event in events\"\n                    :weekDayRef=\"currentDay\"\n                    v-if=\"inCurrentWeek(event)\"\n                    @delete=\"deleteEvent(event)\"\n                    @edit=\"editEvent(event)\"\n                    :event=\"event\"\n                    :key=\"event.id\"></timeevent>\n              </div>\n          </div>\n        </div>\n    </div>\n\n    <footer class=\"line\">\n      FOOTER\n    </footer>\n    </div>",
+    template: "<div class=\"calendar calendar-week\">\n    <div class=\"meta\">\n        <a href=\"#\" @click=\"previousWeek\">\n            <i class=\"icon-left-big\"></i>\n        </a>\n        <h3>\n            semaine {{ currentWeekNum}}, {{ currentMonth }} {{ currentYear }}\n            <nav class=\"copy-paste\">\n                <span href=\"#\" @click=\"copyCurrentWeek\"><i class=\"icon-docs\"></i></span>\n                <span href=\"#\" @click=\"pasteWeek\"><i class=\"icon-paste\"></i></span>\n            </nav>\n        </h3>\n       <a href=\"#\" @click=\"nextWeek\">\n            <i class=\"icon-right-big\"></i>\n       </a>\n    </div>\n\n    <header class=\"line\">\n        <div class=\"content-full\" style=\"margin-right: 12px\">\n            <div class=\"labels-time\">\n                {{currentYear}}\n            </div>\n            <div class=\"events\">\n                <div class=\"cell cell-day day day-1\" :class=\"{today: isToday(day)}\" v-for=\"day in currentWeekDays\">\n                    {{ day.format('dddd D') }}\n                    <nav class=\"copy-paste\">\n                        <span href=\"#\" @click=\"copyDay(day)\"><i class=\"icon-docs\"></i></span>\n                        <span href=\"#\" @click=\"pasteDay(day)\"><i class=\"icon-paste\"></i></span>\n                    </nav>\n                </div>\n            </div>\n        </div>\n    </header>\n\n    <div class=\"content-wrapper\">\n        <div class=\"content-full\">\n          <div class=\"labels-time\">\n            <div class=\"unit timeinfo\" v-for=\"time in 24\">{{time-1}}:00</div>\n          </div>\n          <div class=\"events\">\n\n              <div class=\"cell cell-day day\" v-for=\"day in 7\">\n                <div class=\"hour houroff\" v-for=\"time in 6\">&nbsp;</div>\n                <div class=\"hour\" v-for=\"time in 16\" @dblclick=\"createEvent(day, time+5)\">&nbsp;</div>\n                <div class=\"hour houroff\" v-for=\"time in 2\">&nbsp;</div>\n              </div>\n              <div class=\"content-events\">\n                <timeevent v-for=\"event in events\"\n                    :weekDayRef=\"currentDay\"\n                    v-if=\"inCurrentWeek(event)\"\n                    @delete=\"deleteEvent(event)\"\n                    @edit=\"editEvent(event)\"\n                    :event=\"event\"\n                    :key=\"event.id\"></timeevent>\n              </div>\n          </div>\n        </div>\n    </div>\n\n    <footer class=\"line\">\n      FOOTER\n    </footer>\n    </div>",
 
     methods: {
         inCurrentWeek: function inCurrentWeek(event) {
@@ -521,6 +527,9 @@ var WeekView = (_WeekView = {
     nextWeek: function nextWeek() {
         this.currentDay = (0, _momentTimezone2.default)(this.currentDay).add(1, 'week');
     },
+    isToday: function isToday(day) {
+        return day.format('YYYY-MM-DD') == store.today.format('YYYY-MM-DD');
+    },
     newEvent: function newEvent(evt) {
         evt.id = this.generatedId++;
         this.events.push(evt);
@@ -599,7 +608,7 @@ var ListView = _defineProperty({
             return store.firstEvent;
         },
         lastDate: function lastDate() {
-            return store.firstEvent;
+            return store.lastEvent;
         }
     },
 
@@ -651,7 +660,9 @@ var ListView = _defineProperty({
 
 var Calendar = {
 
-    template: "\n        <div class=\"calendar\">\n            <div class=\"editor\" v-if=\"eventEditData\">\n                <form @submit.prevent=\"editSave\">\n                    <div>\n                        <label for=\"\">Intitul\xE9</label>\n                        <input v-model=\"eventEditData.label\" />\n                    </div>\n                    <div>\n                        <label for=\"\">Description</label>\n                        <input v-model=\"eventEditData.description\" />\n                    </div>\n\n                    <button type=\"button\" @click=\"editCancel\">Annuler</button>\n                    <button type=\"cancel\">Enregistrer</button>\n                </form>\n            </div>\n\n            <nav class=\"views-switcher\">\n                <a href=\"#\" @click.prevent=\"state = 'week'\"><i class=\"icon-calendar\"></i>{{ trans.labelViewWeek }}</a>\n                <a href=\"#\" @click.prevent=\"state = 'month'\"><i class=\"icon-table\"></i>{{ trans.labelViewMonth }}</a>\n                <a href=\"#\" @click.prevent=\"state = 'list'\"><i class=\"icon-columns\"></i>{{ trans.labelViewList }}</a>\n                <input type=\"file\" @change=\"loadIcsFile\">\n            </nav>\n            <monthview v-show=\"state == 'month'\"></monthview>\n            <weekview v-show=\"state == 'week'\"></weekview>\n            <listview v-show=\"state == 'list'\"></listview>\n        </div>\n\n    ",
+    template: "\n        <div class=\"calendar\">\n            <div class=\"editor\" v-if=\"eventEditData\">\n                <form @submit.prevent=\"editSave\">\n                    <div>\n                        <label for=\"\">Intitul\xE9</label>\n                        <input v-model=\"eventEditData.label\" />\n                    </div>\n                    <div>\n                        <label for=\"\">Description</label>\n                        <input v-model=\"eventEditData.description\" />\n                    </div>\n\n                    <button type=\"button\" @click=\"editCancel\">Annuler</button>\n                    <button type=\"cancel\">Enregistrer</button>\n                </form>\n            </div>\n\n            <nav class=\"views-switcher\">\n                <a href=\"#\" @click.prevent=\"state = 'week'\"><i class=\"icon-calendar\"></i>{{ trans.labelViewWeek }}</a>\n                <a href=\"#\" @click.prevent=\"state = 'list'\"><i class=\"icon-columns\"></i>{{ trans.labelViewList }}</a>\n                <input type=\"file\" @change=\"loadIcsFile\">\n            </nav>\n            <weekview v-show=\"state == 'week'\"></weekview>\n            <listview v-show=\"state == 'list'\"></listview>\n        </div>\n\n    ",
+
+    //                <!-- <a href="#" @click.prevent="state = 'month'"><i class="icon-table"></i>{{ trans.labelViewMonth }}</a> -->            <monthview v-show="state == 'month'"></monthview>
 
     data: function data() {
         return store;
@@ -719,7 +730,6 @@ var Calendar = {
     },
 
     mounted: function mounted() {
-        console.log('Mounted !', this);
         if (this.fetch) this.fetch();
         /*
         store.addNewEvent('Item D',

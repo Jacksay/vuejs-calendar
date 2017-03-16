@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i');
 
 $color: #ddd;
+$colorMain: #4490c8;
+
 * {
   box-sizing: border-box;
 }
@@ -12,7 +14,6 @@ body {
 }
 .calendar {
   position: relative;
-
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
@@ -275,6 +276,10 @@ body {
     display: block;
     width: 14.285%;
     background: rgba(0,0,0,.05);
+    &.today {
+      background: rgba(#4490c8, .5);
+      font-weight: bold;
+    }
   }
   .cell:nth-child(odd) {
     background: rgba(0,0,0,.1);
@@ -294,7 +299,17 @@ body {
     text-align: center;
     font-weight: 300;
     text-shadow: 1px -1px 0 rgba(255,255,255,.5);
-    color: rgba(100,100,100,1)
+    color: rgba(100,100,100,1);
+
+    &:hover {
+      .copy-paste {
+        opacity: 1;
+      }
+    }
+
+    .copy-paste {
+      opacity: 0;
+    }
   }
 
   .content-full {
@@ -333,9 +348,10 @@ body {
 
   .hour {
     border-bottom: thin solid rgba(0,0,0,.1);
+    transition: background .3s;
     height: 40px;
     &:not(.houroff):hover{
-      background: rgba(255,255,255,.4);
+      background: rgba($colorMain,.25);
     }
     &.houroff {
       background-image: url('bg.gif');

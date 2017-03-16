@@ -1,6 +1,7 @@
 var assert = require('assert'),
     EventDT = require('../build/js/EventDT'),
     fs = require('fs'),
+    ICAL = require('ical.js'),
     moment = require("moment-timezone"),
     ICalAnalyser = require('../build/js/ICalAnalyser.js')
     ;

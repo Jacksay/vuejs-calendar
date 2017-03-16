@@ -21,6 +21,7 @@
         'moment': '../node_modules/moment/min/moment-with-locales.min',
         'moment-timezone': '../node_modules/moment-timezone/builds/moment-timezone-with-data.min',
         'vue': '../node_modules/vue/dist/vue',
+        'vue-resource': '../node_modules/vue-resource/dist/vue-resource',
         'ical': '../node_modules/ical.js/build/ical.min',
         'EventDT' : 'js/EventDT',
         'calendar' : 'js/calendar',
@@ -51,10 +52,16 @@
     });
   </script>
   <script>
-  require(['vue', 'moment-timezone', 'calendar'], function(Vue, moment, Calendar){
+  require(['vue', 'vue-resource', 'moment-timezone', 'calendar'], function(Vue, VueResource, moment, Calendar){
+
+
+    Vue.use(VueResource);
 
     var mixins = {
       methods: {
+        restUrl(){
+          return "http://127.0.0.1:4000/feuille-de-temps/activite/9099"
+        },
         fetch(){
           console.log("CUSTOM FETCH")
         }

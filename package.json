@@ -30,6 +30,10 @@
     "mocha": "^3.2.0"
   },
   "dependencies": {
-    "moment-timezone": "^0.5.11"
+    "moment-timezone": "^0.5.11",
+    "vue-resource": "^1.2.1"
+  },
+  "directories": {
+    "test": "test"
   }
 }

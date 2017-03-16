@@ -1,6 +1,7 @@
 import EventDT from "EventDT";
 import moment from "moment-timezone"
 import ICalAnalyser from "ICalAnalyser";
+import VueResource from "vue-resource";
 
 moment.locale('fr');
 
@@ -25,7 +26,7 @@ var colorLabel = (label) => {
 
 class CalendarDatas {
     constructor(){
-        this.state = 'week';
+        this.state = 'list';
         this.events = [];
         this.newID = 1;
         this.eventEditData = null;
@@ -197,19 +198,18 @@ var TimeEvent = {
           {{ event.label }}
         </div>
         <div class="description">
-            le {{ dateStart.format() }}
           {{ event.description }}
         </div>
         <template v-if="event.editable">
         <nav class="admin">
-            <a href="#" @click.stop.prevent="$emit('edit')">
+            <a href="#" @click.stop.prevent="$emit('editevent')">
                 <i class="icon-pencil-1"></i>
                 Modifier</a>
-            <a href="#" @click.stop.prevent="$emit('delete')">
+            <a href="#" @click.stop.prevent="$emit('deleteevent')">
                 <i class="icon-trash-empty"></i>
                 Supprimer</a>
 
-            <a href="#" @click.stop.prevent="$emit('send')">
+            <a href="#" @click.stop.prevent="$emit('submitevent')">
                 <i class="icon-right-big"></i>
                 Soumettre</a>
         </nav>
@@ -480,8 +480,9 @@ var WeekView = {
                 <timeevent v-for="event in events"
                     :weekDayRef="currentDay"
                     v-if="inCurrentWeek(event)"
-                    @delete="deleteEvent(event)"
-                    @edit="editEvent(event)"
+                    @deleteevent="$emit('deleteevent', event)"
+                    @editevent="$emit('editevent', event)"
+                    @submitevent="$emit('submitevent', event)"
                     :event="event"
                     :key="event.id"></timeevent>
               </div>
@@ -493,12 +494,6 @@ var WeekView = {
       FOOTER
     </footer>
     </div>`,
-
-    methods: {
-        inCurrentWeek(event){
-            return store.inCurrentWeek(event)
-        }
-    },
 
     computed: {
         currentYear(){
@@ -525,6 +520,13 @@ var WeekView = {
     },
 
     methods: {
+        createEvent(day,time){
+            console.log('Create event');
+            var start = moment(this.currentDay).day(day).hour(time);
+            var end = moment(start).add(2, 'hours');
+            var newEvent = new EventDT(1, this.defaultLabel, start.format(), end.format(), this.defaultDescription, { editable: true, deletable: true});
+            this.$emit('createevent', newEvent);
+        },
         copyDay(dt){
             this.copyDayData = [];
             var dDay = dt.format('MMMM D YYYY');
@@ -619,31 +621,6 @@ var WeekView = {
 
         inCurrentWeek(event){
             return event.inWeek(this.currentDay.year(), this.currentDay.week());
-        },
-
-        deleteEvent(event){
-            this.events.splice(this.events.indexOf(event), 1);
-        },
-
-        createEvent(day,time){
-            var start = moment(this.currentDay).day(day).hour(time);
-            var end = moment(start).add(2, 'hours');
-            this.newEvent(new EventDT(1, this.defaultLabel, start.format(), end.format(), this.defaultDescription, { editable: true, deletable: true}));
-        },
-
-        editEvent(event){
-            this.eventEdit = event;
-            this.eventEditData = JSON.parse(JSON.stringify(event));
-        },
-
-        editSave(){
-            this.defaultLabel = this.eventEdit.label = this.eventEditData.label;
-            this.defaultDescription = this.eventEdit.description = this.eventEditData.description;
-            this.eventEdit = this.eventEditData = null;
-        },
-
-        editCancel(){
-            this.eventEdit = this.eventEditData = null;
         }
     },
 
@@ -664,10 +641,38 @@ var MonthView = {
 };
 
 var ListItemView = {
-    template: `<article class="list-item" :style="css" :class="cssClass" @click="$emit('selectevent', event)">
-        <time class="start">{{ beginAt }}</time>
-        <strong>{{ event.label }}</strong>
+    template: `<article class="list-item" :style="css" :class="cssClass">
+        <time class="start">{{ beginAt }}</time> -
         <time class="end">{{ endAt }}</time>
+        <strong>{{ event.label }}</strong>
+        <div class="details">
+            <h4>
+                <i class="picto" :style="{background: colorLabel}"></i>
+                {{ event.label }}</h4>
+            <p class="time">
+                de <time class="start">{{ beginAt }}</time> à <time class="end">{{ endAt }}</time> ~ état : <em>{{ event.status }}</em>
+            </p>
+            <p class="description">
+                {{ event.description }}
+            </p>
+            <nav>
+                <button class="btn btn-primary btn-xs" @click="$emit('selectevent', event)">
+                    <i class="icon-calendar"></i>
+                Voir la semaine</button>
+
+                <button class="btn btn-primary btn-xs"  @click="$emit('editevent', event)">
+                    <i class="icon-pencil-1"></i>
+                    Modifier</button>
+
+                <button class="btn btn-primary btn-xs"  @click="$emit('submitevent', event)">
+                    <i class="icon-pencil-1"></i>
+                    Soumettre</button>
+
+                <button class="btn btn-primary btn-xs"  @click="$emit('deleteevent', event)">
+                    <i class="icon-trash-empty"></i>
+                    Supprimer</button>
+            </nav>
+        </div>
     </article>`,
     props: ['event'],
     computed: {
@@ -680,6 +685,9 @@ var ListItemView = {
         cssClass(){
             return 'status-' + this.event.status;
         },
+        colorLabel(){
+            return colorLabel(this.event.label);
+        },
         css(){
             var percentUnit = 100 / (18*60)
                 , start = (this.event.mmStart.hour()-6)*60 + this.event.mmStart.minutes()
@@ -688,7 +696,7 @@ var ListItemView = {
             return {
                 left: (percentUnit * start) +'%',
                 width: (percentUnit * (end - start)) +'%',
-                background: colorLabel(this.event.label)
+                background: this.colorLabel
             }
         }
     }
@@ -718,7 +726,12 @@ var ListView = {
             <section class="events">
                 <h3>{{ pack.label }}</h3>
                 <section class="events-list">
-                <listitem @selectevent="selectEvent" v-bind:event="event" v-for="event in pack.events"></listitem>
+                <listitem
+                    @selectevent="selectEvent"
+                    @editevent="$emit('editevent', event)"
+                    @deleteevent="$emit('deleteevent', event)"
+                    @submitevent="$emit('submitevent', event)"
+                    v-bind:event="event" v-for="event in pack.events"></listitem>
                 </section>
                 <div class="total">
                     {{ pack.totalHours }} heure(s)
@@ -775,17 +788,17 @@ var Calendar = {
         <div class="calendar">
             <div class="editor" v-if="eventEditData">
                 <form @submit.prevent="editSave">
-                    <div>
+                    <div class="form-group">
                         <label for="">Intitulé</label>
-                        <input v-model="eventEditData.label" />
+                        <input v-model="eventEditData.label" class="form-control" />
                     </div>
                     <div>
                         <label for="">Description</label>
-                        <input v-model="eventEditData.description" />
+                        <textarea class="form-control" v-model="eventEditData.description"></textarea>
                     </div>
 
-                    <button type="button" @click="editCancel">Annuler</button>
-                    <button type="cancel">Enregistrer</button>
+                    <button type="button" @click="handlerEditCancelEvent">Annuler</button>
+                    <button type="cancel" @click="handlerSaveEvent">Enregistrer</button>
                 </form>
             </div>
 
@@ -794,8 +807,8 @@ var Calendar = {
                 <a href="#" @click.prevent="state = 'list'"><i class="icon-columns"></i>{{ trans.labelViewList }}</a>
                 <input type="file" @change="loadIcsFile">
             </nav>
-            <weekview v-show="state == 'week'"></weekview>
-            <listview v-show="state == 'list'"></listview>
+            <weekview v-show="state == 'week'" @editevent="handlerEditEvent" @deleteevent="handlerDeleteEvent" @submitevent="handlerSubmitEvent" @createevent="handlerCreateEvent"></weekview>
+            <listview v-show="state == 'list'" @editevent="handlerEditEvent" @deleteevent="handlerDeleteEvent" @submitevent="handlerSubmitEvent"></listview>
         </div>
 
     `,
@@ -825,7 +838,45 @@ var Calendar = {
 
     methods: {
 
+        editSave(){
+            this.defaultLabel = this.eventEdit.label = this.eventEditData.label;
+            this.defaultDescription = this.eventEdit.description = this.eventEditData.description;
+            this.eventEdit = this.eventEditData = null;
+        },
 
+        handlerEditCancelEvent(){
+            this.eventEdit = this.eventEditData = null;
+        },
+
+        /** Edition de l'événement de la liste */
+        handlerEditEvent(event){
+            console.log('Edition', arguments);
+            this.eventEdit = event;
+            this.eventEditData = JSON.parse(JSON.stringify(event));
+        },
+
+        /** Suppression de l'événement de la liste */
+        handlerDeleteEvent(event){
+            console.log('Suppression', arguments);
+            store.events.splice(store.events.indexOf(event), 1);
+        },
+
+        /** Suppression de l'événement de la liste */
+        handlerSaveEvent(event){
+            this.defaultLabel = this.eventEdit.label = this.eventEditData.label;
+            this.defaultDescription = this.eventEdit.description = this.eventEditData.description;
+            this.eventEdit = this.eventEditData = null;
+        },
+
+        /** Soumission de l'événement de la liste */
+        handlerSubmitEvent(event){
+            console.log('Envoi', arguments)
+        },
+
+        /** Soumission de l'événement de la liste */
+        handlerCreateEvent(event){
+            this.events.push(event);
+        },
 
         loadIcsFile(e){
             var fr = new FileReader();
@@ -872,17 +923,33 @@ var Calendar = {
 
         editCancel(){
             this.eventEdit = this.eventEditData = null;
+        },
+
+        /////////////////////////////////////////////////////////////////// REST
+        fetch(){
+            this.$http.get(this.restUrl()).then(
+                ok => {
+                    console.log(ok);
+                },
+                ko => {
+                    //this.errors.push("Impossible de charger les données")
+                    console.log("ERROR", ko)
+                }
+            );
+
         }
     },
 
     mounted(){
-        if( this.fetch ) this.fetch();
-        /*
-        store.addNewEvent('Item D',
-            "2017-03-16T13:30", "2017-03-16T17:45", "Envoyée (à valider)",
+        if( this.restUrl ){
+            this.fetch();
+        }
+
+        store.addNewEvent('CM Technologies du Web, Framework Javascript',
+            "2017-03-16T13:30", "2017-03-16T17:45", "lorem  ipsum détails complet à afficher dans la bulle d'information compélementaire...",
             { editable: true, deletable: true},
             'draft');
-
+        /*
         store.addNewEvent('Item D',
             "2017-03-16T08:30", "2017-03-16T12:45", "Envoyée (à valider)",
             { editable: true, deletable: true},

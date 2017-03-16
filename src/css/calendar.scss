@@ -49,7 +49,8 @@ body {
     align-items: center;
     justify-content: center;
     form {
-
+      min-width: 450px;
+      max-width: 50vw;
     }
   }
 
@@ -131,8 +132,12 @@ body {
       line-height: 1.25;
       padding: 2px 0;
       margin-bottom: .3em;
+      text-align: left;
       //text-shadow: 1px -1px 0 rgba(255,255,255,.25);
       color: black;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: block;
     }
 
     .description {
@@ -166,12 +171,17 @@ body {
     }
   }
 
+  .picto:before {
+    color: white;
+    padding: 2px;
+  }
+
   .list-item {
     strong {
       text-shadow: 1px -1px 0 rgba(255,255,255,.5);
     }
-    strong:before {
-
+    strong:before, .picto:before {
+      border-radius: 4px;
       font-family: "fontello";
       font-style: normal;
       font-weight: normal;
@@ -202,13 +212,13 @@ body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    &.status-draft strong:before {
+    &.status-draft strong:before, &.status-draft .picto:before {
       content: '\e882'; }
-    &.status-send strong:before{
+    &.status-send strong:before, &.status-send .picto:before{
       content: '\e88a'; }
-    &.status-valid strong:before {
+    &.status-valid strong:before, &.status-valid .picto:before {
       content: '\e85b'; }
-    &.status-reject strong:before {
+    &.status-reject strong:before, &.status-reject .picto:before {
       content: '\e865'; }
 
   }
@@ -217,7 +227,7 @@ body {
     .event {
 
     &.status-draft, &.status-send, &.status-valid, &.status-reject {
-      .label:before, .label:before {
+      .label:before, .picto:before {
         font-family: "fontello";
         font-style: normal;
         font-weight: normal;
@@ -252,13 +262,13 @@ body {
         /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
       }
     }
-    &.status-draft .label:before, &.status-draft .label:before {
+    &.status-draft .label:before, &.status-draft .picto:before {
       content: '\e882'; }
-    &.status-send .label:before, &.status-send .label:before {
+    &.status-send .label:before, &.status-send .picto:before {
       content: '\e88a'; }
-    &.status-valid .label:before, &.status-valid .label:before {
+    &.status-valid .label:before, &.status-valid .picto:before {
       content: '\e85b'; }
-    &.status-reject .label:before, &.status-reject .label:before {
+    &.status-reject .label:before, &.status-reject .picto:before {
       content: '\e865'; }
   }
 
@@ -409,19 +419,53 @@ body {
         background: white;
         align-items: center;
         justify-content: space-between;
-        padding: 2px 4px;
+        padding: 1px 2px;
+
         time {
-          flex: 1;
+          flex: 0;
           font-weight: 100;
           font-size: .9em;
         }
         strong {
+          white-space: nowrap;
           text-align: center;
           font-weight: normal;
-          flex: 2
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .details {
+          left: 0;
+          position: absolute;
+          display: none;
+          background: white;
+          padding: 10px 1em .5em;
+          box-shadow: 0 0 1em rgba(0,0,0,.5);
+          min-width: 350px;
+          &:before {
+            content: "";
+            background: white;
+            width: 8px;
+            height: 8px;
+            top: -4px;
+            transform: rotate(45deg);
+            display: block;
+            position: absolute;
+          }
+          h4 {
+            margin: 0;
+            padding:0;
+          }
+          .description { font-weight: 100}
         }
         .end {
           text-align: right;
+        }
+        &:hover {
+          .details {
+            z-index: 1000;
+            display: block;
+          }
         }
       }
     }

@@ -3,17 +3,22 @@ import moment from "moment";
 moment.locale('fr');
 
 class EventDT {
-  constructor(id, label, start, end, description="", actions={}, status='draft'){
+  constructor(id, label, start, end, description="", actions={}, status='draft', owner=""){
     this.id = id;
 
     // From ICS format
-    this.uid = null;
+    this.uid = EventDT.UID++;
 
     // ICS : summary
     this.label = label;
 
+
     // ICS : description
     this.description = description;
+
+    this.owner = owner;
+    this.intersect = 0;
+    this.intersectIndex = 0;
 
 
     // OSCAR
@@ -22,14 +27,11 @@ class EventDT {
     this.validable = actions.validable || false;
     this.sendable= actions.sendable || false;
 
-    this.status = status;
-
-
     // Status
     // - DRAFT, SEND, VALID, REJECT
+    this.status = status;
 
     this.start = start;
-
     this.end = end;
   }
 
@@ -82,6 +84,15 @@ class EventDT {
     return mmStart < plageFin || mmEnd > plageStart;
   }
 
+  overlap(otherEvent){
+    let   startU1 = this.mmStart.unix()
+        , endU1 = this.mmEnd.unix()
+        , startU2 = otherEvent.mmStart.unix()
+        , endU2 = otherEvent.mmEnd.unix()
+        ;
+    return startU1 < endU2 && startU2 < endU1;
+  }
+
   isBefore( eventDT ){
     if( this.mmStart < eventDT.mmStart ){
       return true;
@@ -89,6 +100,21 @@ class EventDT {
     return false;
   }
 
+  sync( data ){
+    console.log("Synchronisation de l'événement", this.id, "avec", data);
+    if( data.id ) this.id = data.id;
+    if( data.label ) this.label = data.label;
+    if( data.description ) this.description = data.description;
+    if( data.start ) this.start = data.start;
+    if( data.end ) this.end = data.end;
+    if( data.status ) this.status = data.status;
+    if( data.credentials ) {
+      this.editable = data.credentials.editable;
+      this.deletable = data.credentials.deletable;
+      this.validable = data.credentials.validable;
+      this.sendable= data.credentials.sendable;
+    }
+  }
 
   static first( events ){
     var first = null;
@@ -118,3 +144,5 @@ class EventDT {
     return sorted;
   }
 }
+
+EventDT.UID = 1

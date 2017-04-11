@@ -14,7 +14,6 @@ body {
     color: black; }
   to {
     color: #4490c8; } }
-
 .calendar {
   position: relative;
   -webkit-touch-callout: none;
@@ -109,7 +108,7 @@ body {
         font-size: .7em; }
       .calendar .importer-ui .list-item span {
         flex: 1;
-        padding-left: .5em; }
+        padding-left: 0.5em; }
       .calendar .importer-ui .list-item.imported {
         opacity: 1; }
     .calendar .importer-ui h1 {
@@ -492,3 +491,5 @@ body {
       .calendar-list .events .events-list .list-item:hover .details {
         z-index: 1000;
         display: block; }
+
+/*# sourceMappingURL=calendar.css.map */

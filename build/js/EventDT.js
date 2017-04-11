@@ -26,13 +26,14 @@ var EventDT = function () {
     var description = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "";
     var actions = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
     var status = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 'draft';
+    var owner = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : "";
 
     _classCallCheck(this, EventDT);
 
     this.id = id;
 
     // From ICS format
-    this.uid = null;
+    this.uid = EventDT.UID++;
 
     // ICS : summary
     this.label = label;
@@ -40,19 +41,21 @@ var EventDT = function () {
     // ICS : description
     this.description = description;
 
+    this.owner = owner;
+    this.intersect = 0;
+    this.intersectIndex = 0;
+
     // OSCAR
     this.editable = actions.editable || false;
     this.deletable = actions.deletable || false;
     this.validable = actions.validable || false;
     this.sendable = actions.sendable || false;
 
-    this.status = status;
-
     // Status
     // - DRAFT, SEND, VALID, REJECT
+    this.status = status;
 
     this.start = start;
-
     this.end = end;
   }
 
@@ -83,12 +86,38 @@ var EventDT = function () {
       return mmStart < plageFin || mmEnd > plageStart;
     }
   }, {
+    key: "overlap",
+    value: function overlap(otherEvent) {
+      var startU1 = this.mmStart.unix(),
+          endU1 = this.mmEnd.unix(),
+          startU2 = otherEvent.mmStart.unix(),
+          endU2 = otherEvent.mmEnd.unix();
+      return startU1 < endU2 && startU2 < endU1;
+    }
+  }, {
     key: "isBefore",
     value: function isBefore(eventDT) {
       if (this.mmStart < eventDT.mmStart) {
         return true;
       }
       return false;
+    }
+  }, {
+    key: "sync",
+    value: function sync(data) {
+      console.log("Synchronisation de l'événement", this.id, "avec", data);
+      if (data.id) this.id = data.id;
+      if (data.label) this.label = data.label;
+      if (data.description) this.description = data.description;
+      if (data.start) this.start = data.start;
+      if (data.end) this.end = data.end;
+      if (data.status) this.status = data.status;
+      if (data.credentials) {
+        this.editable = data.credentials.editable;
+        this.deletable = data.credentials.deletable;
+        this.validable = data.credentials.validable;
+        this.sendable = data.credentials.sendable;
+      }
     }
   }, {
     key: "mmStart",
@@ -156,5 +185,7 @@ var EventDT = function () {
 
   return EventDT;
 }();
+
+EventDT.UID = 1;
 return EventDT;
 }));

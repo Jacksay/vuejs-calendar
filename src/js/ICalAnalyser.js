@@ -43,7 +43,7 @@ class ICalAnalyser {
             }
             return [].concat(this.generateItem(part1)).concat(this.generateItem(part2));
         }
-        return [{summary: item.summary, start: item.start, end: item.end, description: item.description }];
+        return [{label: item.summary, summary: item.summary, start: item.start, end: item.end, description: item.description }];
     }
 
     /**

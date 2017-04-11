@@ -76,4 +76,47 @@ describe('Test EventDT instance', ()=>{
         assert.equal(e1.duration, 4, 'Dure 4 heures');
         assert.equal(e2.duration, 2.5, 'Dure 2.5 heures');
     })
+
+
+    it('Methods overlap(event), OVERLAP', ()=>{
+        var u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        var u2 = new EventDT(2,'U2','2017-07-04 08:00', '2017-07-04 10:00');
+
+        assert.equal(u1.overlap(u2), true, "U1 et U2 sont identique");
+
+        u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        u2 = new EventDT(2,'U2','2017-07-04 09:00', '2017-07-04 11:00');
+        assert.equal(u1.overlap(u2), true, "U1 est croisé avec U2");
+
+        u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        u2 = new EventDT(2,'U2','2017-07-04 07:00', '2017-07-04 09:00');
+        assert.equal(u1.overlap(u2), true, "U2 est croisé avec U1");
+
+        u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        u2 = new EventDT(2,'U2','2017-07-04 08:30', '2017-07-04 09:30');
+        assert.equal(u1.overlap(u2), true, "U2 est dans U1");
+
+        u1 = new EventDT(1,'U1','2017-07-04 09:00', '2017-07-04 10:00');
+        u2 = new EventDT(2,'U2','2017-07-04 08:30', '2017-07-04 11:00');
+        assert.equal(u1.overlap(u2), true, "U2 est dans U1");
+    })
+
+    it('Methods overlap(event), NOOVERLAP', ()=>{
+        var u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        var u2 = new EventDT(2,'U2','2017-07-04 10:00', '2017-07-04 11:00');
+        assert.equal(u1.overlap(u2), false, "U1 fini au début de U2");
+
+        var u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        var u2 = new EventDT(2,'U2','2017-07-04 06:00', '2017-07-04 08:00');
+        assert.equal(u1.overlap(u2), false, "U2 fini au début de U1");
+
+        var u1 = new EventDT(1,'U1','2017-07-04 08:00', '2017-07-04 10:00');
+        var u2 = new EventDT(2,'U2','2017-07-04 11:00', '2017-07-04 12:00');
+        assert.equal(u1.overlap(u2), false, "U1 avant U2");
+
+        var u1 = new EventDT(1,'U1','2017-07-04 09:00', '2017-07-04 10:00');
+        var u2 = new EventDT(2,'U2','2017-07-04 06:00', '2017-07-04 08:00');
+        assert.equal(u1.overlap(u2), false, "U2 avant U1");
+
+    })
 });

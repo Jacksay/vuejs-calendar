@@ -2,7 +2,7 @@
 
 $color: #ddd;
 $colorMain: #4490c8;
-
+/*
 * {
   box-sizing: border-box;
 }
@@ -11,7 +11,18 @@ body {
   font-size: 14px;
   font-family: 'Open Sans';
   background: #ddd;
+}*/
+
+@keyframes clignote {
+  from {
+    color: black;
+  }
+
+  to {
+    color: $colorMain;
+  }
 }
+
 .calendar {
   position: relative;
   -webkit-touch-callout: none; /* iOS Safari */
@@ -20,6 +31,51 @@ body {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none;
+  background: rgba(255,255,255,.8);
+
+  .calendar-menu {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .views-switcher {
+    a {
+      display: inline-block;
+      font-size: .8em;
+      font-weight: 100;
+      padding: 1em;
+      color: rgba(0,0,0,.5);
+      border-right: thin solid rgba(0,0,0,.1);
+      text-decoration: none;
+      &.active {
+        text-decoration: underline;
+      }
+      &:hover {
+        background: $colorMain;
+        color: white;
+        text-shadow: -1px 1px 0 rgba(0,0,0,.2);
+      }
+    }
+  }
+
+  .transmission {
+    padding: 1em;
+    color: $colorMain;
+    font-size: .8em;
+    font-weight: 100;
+    animation-duration: .5s;
+    animation-name: clignote;
+    animation-iteration-count: infinite;
+  }
+
+  .errors {
+    color: #9a1e1b;
+    animation: none;
+    .fermer {
+      color: darken(#9a1e1b, 15%);
+    }
+  }
 
   .copy-paste {
     display: inline;
@@ -36,8 +92,80 @@ body {
       }
     }
   }
+  .importer-ui {
+    border: solid thin rgba(0,0,0,.25);
+    box-shadow: 0 0 1em rgba(0,0,0,.1);
+    padding: 1em;
+    background: white;
 
-  .editor {
+    h2 {
+      font-weight: 400;
+      font-size: 1.5em;
+    }
+
+    .buttons {
+      text-align: center;
+      border-top: thin solid rgba(black, .25);
+      margin-top: 1em;
+      padding: .5em 0;
+    }
+
+    .correspondances {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      flex-flow: wrap;
+      article {
+        strong { display: block }
+        flex: 1;
+        padding: .25em .5em;
+        margin: 4px;
+        box-shadow: 0 0 8px rgba(0,0,0,.2);
+      }
+    }
+
+    .square {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      line-height: 12px;
+      margin-right: 4px;
+    }
+
+    .list-item {
+      opacity: .5;
+      white-space: nowrap;
+      time { font-size: .7em}
+      span { flex: 1; padding-left: .5em }
+      &.imported {
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      margin: 0 0 1em;
+      font-size: 2em;
+      font-weight: 100;
+    }
+
+    .steps {
+      line-height: 2em;
+      border-bottom: solid thin rgba(0,0,0,.25);
+      margin-bottom: .5em;
+      span {
+        padding: .25em .5em;
+        font-weight: 100;
+        display: inline-block;
+      }
+      .active {
+        font-weight: 600;
+        background: desaturate($colorMain, 25%);
+        color: white;
+        text-shadow: -1px 1px 0 rgba(0,0,0,.25);
+      }
+    }
+  }
+  .editor, .importer {
     background: rgba(255,255,255,.9);
     display: flex;
     position: fixed;
@@ -52,16 +180,34 @@ body {
       min-width: 450px;
       max-width: 50vw;
     }
+    .importer-ui {
+      width: 90vw;
+      .calendar {
+        max-height: 30vh;
+        overflow-y: scroll;
+        border: thin solid rgba(0,0,0,.2);
+        padding: 4px;
+        article {
+          margin: 2px;
+        }
+        article:nth-child(odd){
+          background: rgba(0,0,0,.05);
+        }
+      }
+      .buttons {
+        display: flex;
+      }
+    }
   }
 
   .event {
     border: solid thin rgba(0,0,0,.5);
     cursor: pointer;
-    padding: 0 4px;
+    padding: 2px;
     margin: 0 .5%;
     box-shadow: 0 0 4px rgba(0,0,0,.3);
     background-color: rgba(255,255,255,.9);
-
+    //font-size: .7em;
     .bottom-handler {
       display: block;
       position: absolute;
@@ -69,7 +215,7 @@ body {
       text-align: center;
       text-shadow: -1px 1px 0 rgba(0,0,0,.3), 1px -1px 0 rgba(255,255,255,.3);
       border-top: solid thin rgba(0,0,0,.3);
-      font-size: .7em;
+      opacity: 0;
       left: 1em;
       right: 1em;
       color: rgba(0,0,0,.5);
@@ -83,27 +229,38 @@ body {
       text-align: center;
       background: black;
       line-height: 20px;
-      height: 20px;
-      top: -20px;
+      top: 0px;
       position: absolute;
-      left: 0;
+      //left: 0;
       border: solid thin black;
-      right: 0;
+      left: 100%;
       display: none;
 
       a {
         opacity: .75;
         text-decoration: none;
         color: rgba(255,255,255, 1);
+        display: block;
+        white-space: nowrap;
+        text-align: left;
+        padding: 2px 8px 2px 4px;
         &:hover {
           opacity: 1;
+          background: $colorMain;
         }
       }
       &:hover {
         z-index: 100;
       }
     }
-    &:hover nav { display: block }
+    &:hover {
+      z-index: 100;
+      .bottom-handler { opacity: 1}
+      nav { display: block }
+      .time {
+        background: rgba(0,0,0,.5);
+      }
+    }
 
     &.event-moving {
       cursor: move;
@@ -114,6 +271,12 @@ body {
       .bottom-handler {
         //transform: scaleY(4);
         background-color: rgba(255,255,255,0);
+      }
+      time {
+        background: black;
+      }
+      nav {
+        display: none;
       }
     }
 
@@ -128,10 +291,11 @@ body {
 
     .label {
       font-weight: 400;
-      border-bottom: dotted #000 thin;
-      line-height: 1.25;
-      padding: 2px 0;
-      margin-bottom: .3em;
+      border-bottom: dotted rgba(0,0,0,.3) thin;
+      line-height: 1.25em;
+      padding: 0;
+      font-weight: 600;
+      margin-bottom: 2px;
       text-align: left;
       //text-shadow: 1px -1px 0 rgba(255,255,255,.25);
       color: black;
@@ -140,10 +304,19 @@ body {
       display: block;
     }
 
+    small {
+      display: block;
+      font-size: .75em;
+    }
+
     .description {
       font-size: .8em;
       font-weight: lighter;
       color: black;
+      position: absolute;
+      top: 3em;
+      bottom: 2em;
+      overflow: hidden;
     }
 
     .time {
@@ -154,8 +327,7 @@ body {
       font-size: .75em;
       font-weight: lighter;
       text-align: right;
-      width: 3em;
-      padding: 1px;
+      padding: 1px 2px;
 
       &.start {
         top: 0;
@@ -220,13 +392,29 @@ body {
       content: '\e85b'; }
     &.status-reject strong:before, &.status-reject .picto:before {
       content: '\e865'; }
-
+    &.status-info strong:before, &.status-info .picto:before {
+      content: '\e85e'; }
   }
 
+  .status-draft {
+    border-left: solid 4px grey;
+  }
 
+  .status-send {
+    border-left: solid 4px black;
+  }
+
+  .status-valid {
+    border-left: solid 4px green;
+  }
+
+  .status-reject {
+    border-left: solid 4px darkred;
+  }
     .event {
 
-    &.status-draft, &.status-send, &.status-valid, &.status-reject {
+
+    &.status-draft, &.status-send, &.status-valid, &.status-reject, &.status-info {
       .label:before, .picto:before {
         font-family: "fontello";
         font-style: normal;
@@ -270,6 +458,10 @@ body {
       content: '\e85b'; }
     &.status-reject .label:before, &.status-reject .picto:before {
       content: '\e865'; }
+
+    &.status-info .label:before, &.status-info .picto:before {
+      content: '\e85e'; }
+
   }
 
   .line {
@@ -370,11 +562,9 @@ body {
     }
   }
 
-
-
   .content-wrapper {
-    max-height: 80vh;
-    overflow: scroll;
+    max-height: 70vh;
+    overflow-y: scroll;
     position: relative;
     scroll-behavior: smooth;
   }
@@ -436,6 +626,7 @@ body {
         }
         .details {
           left: 0;
+          top: 1.25em;
           position: absolute;
           display: none;
           background: white;

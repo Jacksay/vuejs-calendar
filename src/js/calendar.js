@@ -1135,6 +1135,7 @@ var Calendar = {
                 <form @submit.prevent="editSave">
                     <div class="form-group">
                         <label for="">Intitulé</label>
+                        <input type="text" v-model="eventEditData.label" />
                         <select v-model="eventEditData.label" class="select2">
                             <option v-for="label in labels" :value="label">{{label}}</option>
                         </select>
